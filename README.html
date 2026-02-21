@@ -357,86 +357,170 @@ display: none;
 <div id="project-overview" class="section level2">
 <h2>Project Overview</h2>
 <p>This project implements a Bayesian two-component Gaussian mixture
-model in Stan to identify latent subgroups in gene expression data from
-the dataset <strong>Breast_GSE45827.csv</strong>.</p>
-<p>The goal is to demonstrate mastery of Bayesian modeling, mixture
-models, and implementation using R and Stan.</p>
-<hr />
-</div>
-<div id="data" class="section level2">
-<h2>Data</h2>
-<p>Dataset: Breast_GSE45827.csv<br />
-Location: data/raw/</p>
-<p>From all numeric gene expression columns, the gene with the highest
-variance across samples was selected.<br />
-The expression values were standardized (mean 0, standard deviation
-1).</p>
-<hr />
-</div>
-<div id="model" class="section level2">
-<h2>Model</h2>
-<p>A two-component Gaussian mixture model was fitted:</p>
-<p>x_n ~ theta * Normal(mu1, sigma1) + (1 - theta) * Normal(mu2,
-sigma2)</p>
-<div id="priors" class="section level3">
-<h3>Priors</h3>
+model in Stan to identify latent expression subgroups in breast cancer
+gene expression data.</p>
+<p>The objective is to demonstrate practical and theoretical
+understanding of:</p>
 <ul>
-<li>mu_k ~ Normal(0, 5)<br />
+<li>Bayesian statistical modeling<br />
 </li>
-<li>sigma_k ~ Exponential(1)<br />
+<li>Finite mixture models<br />
 </li>
-<li>theta ~ Beta(2, 2)</li>
+<li>Markov Chain Monte Carlo (MCMC) inference<br />
+</li>
+<li>Probabilistic programming using Stan<br />
+</li>
+<li>Reproducible data science workflows in R</li>
 </ul>
 <hr />
 </div>
+<div id="dataset" class="section level2">
+<h2>Dataset</h2>
+<p>The gene expression dataset used in this project is publicly
+available on Kaggle:</p>
+<p><strong>Breast Cancer Gene Expression (CUMIDA)</strong><br />
+<a href="https://www.kaggle.com/datasets/brunogrisci/breast-cancer-gene-expression-cumida" class="uri">https://www.kaggle.com/datasets/brunogrisci/breast-cancer-gene-expression-cumida</a></p>
+<p>The specific dataset used:</p>
+<p>Breast_GSE45827.csv</p>
+<p>Dataset characteristics:</p>
+<ul>
+<li>151 samples<br />
+</li>
+<li>54,677 gene probes<br />
+</li>
+<li>First columns: metadata (<code>samples</code>,
+<code>type</code>)<br />
+</li>
+<li>Remaining columns: gene expression values</li>
+</ul>
+<p>Due to GitHub’s 100 MB file size limit, the dataset is not included
+in this repository.</p>
+<div id="reproducibility" class="section level3">
+<h3>Reproducibility</h3>
+<p>To reproduce the analysis:</p>
+<ol style="list-style-type: decimal">
+<li>Download the dataset from Kaggle.</li>
+<li>Extract the file.</li>
+<li>Place it inside: /data/raw so that the file path becomes:
+data/raw/Breast_GSE45827.csv</li>
+</ol>
+<hr />
+</div>
+</div>
+<div id="statistical-model" class="section level2">
+<h2>Statistical Model</h2>
+<p>For a selected gene, standardized expression values<br />
+x₁, x₂, …, xₙ are modeled as a two-component Gaussian mixture:</p>
+<p>p(xₙ) = θ · Normal(μ₁, σ₁) + (1 − θ) · Normal(μ₂, σ₂)</p>
+<p>where:</p>
+<ul>
+<li>μ₁, μ₂ are component means<br />
+</li>
+<li>σ₁, σ₂ &gt; 0 are component standard deviations<br />
+</li>
+<li>θ ∈ (0,1) is the mixing proportion</li>
+</ul>
+<p>To prevent label switching, the component means are constrained:</p>
+<p>μ₁ &lt; μ₂</p>
+<hr />
+</div>
+<div id="prior-distributions" class="section level2">
+<h2>Prior Distributions</h2>
+<p>The priors are defined as:</p>
+<ul>
+<li>μₖ ~ Normal(0, 5)<br />
+</li>
+<li>σₖ ~ Exponential(1)<br />
+</li>
+<li>θ ~ Beta(2, 2)</li>
+</ul>
+<p>Gene expression values are standardized before modeling:</p>
+<p>x = (x_raw − mean(x_raw)) / sd(x_raw)</p>
+<p>This improves numerical stability and makes priors weakly
+informative.</p>
+<hr />
 </div>
 <div id="inference" class="section level2">
 <h2>Inference</h2>
+<p>Inference is performed using:</p>
 <ul>
-<li>Implemented in Stan using cmdstanr<br />
+<li>Stan (via cmdstanr)</li>
+<li>4 parallel MCMC chains</li>
+<li>1000 warmup iterations</li>
+<li>1000 sampling iterations per chain</li>
+<li>adapt_delta = 0.95</li>
+</ul>
+<p>Convergence diagnostics:</p>
+<ul>
+<li>R-hat ≈ 1.00–1.01<br />
 </li>
-<li>4 MCMC chains<br />
+<li>High effective sample sizes<br />
 </li>
-<li>1000 warmup iterations<br />
-</li>
-<li>1000 sampling iterations per chain<br />
-</li>
-<li>Convergence diagnostics: Rhat ≈ 1.01 for all parameters</li>
+<li>No divergent transitions</li>
+</ul>
+<p>Model evaluation:</p>
+<ul>
+<li>Leave-One-Out Cross-Validation (LOO)</li>
 </ul>
 <hr />
 </div>
-<div id="results-posterior-means" class="section level2">
-<h2>Results (Posterior Means)</h2>
+<div id="example-results" class="section level2">
+<h2>Example Results</h2>
+<p>Posterior mean estimates for an example probe:</p>
 <ul>
-<li>theta ≈ 0.44<br />
+<li>θ ≈ 0.44<br />
 </li>
-<li>mu1 ≈ 0.94<br />
+<li>μ₁ ≈ −0.72<br />
 </li>
-<li>mu2 ≈ -0.72<br />
+<li>μ₂ ≈ 0.94<br />
 </li>
-<li>sigma1 ≈ 0.50<br />
+<li>σ₁ ≈ 0.61<br />
 </li>
-<li>sigma2 ≈ 0.61</li>
+<li>σ₂ ≈ 0.50</li>
 </ul>
-<p>The model identifies two latent expression clusters in the selected
-gene.</p>
+<p>The separation between μ₁ and μ₂ suggests bimodal expression behavior
+for the selected gene.</p>
+<p>Posterior predictive checks confirm that the model captures the
+observed distributional structure.</p>
 <hr />
 </div>
-<div id="reproducibility" class="section level2">
-<h2>Reproducibility</h2>
-<p>To reproduce the results:</p>
-<pre class="r"><code>source(&quot;r/run.R&quot;)</code></pre>
-<p>All outputs (model fit, summary tables, plots) are saved in:</p>
-<pre><code>output/</code></pre>
-<hr />
+<div id="running-the-project" class="section level2">
+<h2>Running the Project</h2>
+<p>From the project root directory:</p>
+<pre class="r"><code>source(&quot;r/run.R&quot;)
+Outputs are automatically generated in:
+output/</code></pre>
 </div>
-<div id="project-structure" class="section level2">
-<h2>Project Structure</h2>
-<pre><code>data/raw/       -&gt; Original dataset
-stan/           -&gt; Stan model file
-r/run.R         -&gt; Main execution script
-output/         -&gt; Results and plots
-admin/README.md -&gt; Project documentation</code></pre>
+<div id="generated-files-include" class="section level2">
+<h2>Generated files include:</h2>
+<p>Model fit (.rds)</p>
+<p>Posterior summaries (.csv)</p>
+<p>Diagnostics (R-hat, ESS)</p>
+<p>Trace plots</p>
+<p>Posterior density plots</p>
+<p>Posterior predictive checks</p>
+<p>LOO results</p>
+<p>Run report ## Project Structure project_mixture_geneexpr/ │ ├── data/
+│ └── raw/ │ └── Breast_GSE45827.csv │ ├── stan/ │ └──
+mixture_gaussian_2comp.stan │ ├── r/ │ └── run.R │ ├── output/ │ └──
+README.md ## Scientific Relevance</p>
+<p>Finite mixture models are useful in genomics for detecting latent
+biological subgroups, tumor heterogeneity, or differential expression
+patterns.</p>
+<p>This project demonstrates how Bayesian inference:</p>
+<p>Quantifies uncertainty in latent structure</p>
+<p>Avoids hard clustering</p>
+<p>Provides full posterior distributions</p>
+<p>Enables principled model comparison</p>
+<p>Future Extensions</p>
+<p>Three-component mixture model</p>
+<p>Hierarchical Bayesian mixture</p>
+<p>Automatic gene screening pipeline</p>
+<p>Subtype-specific modeling</p>
+<p>Comparison with EM-based Gaussian mixtures</p>
+<p>Author</p>
+<p>Maryam Malahnejad MSc Applied Informatics University of
+Duisburg-Essen —</p>
 </div>
 </div>
 
