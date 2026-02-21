@@ -1,0 +1,20 @@
+Gene: 117_at
+N: 151
+Standardization: scale(x_raw)
+Stan file: stan/mixture_gaussian_2comp.stan
+Data file: data/raw/Breast_GSE45827.csv
+
+LOO:
+
+Computed from 4000 by 151 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo   -215.2  9.9
+p_loo         3.8  0.8
+looic       430.3 19.8
+------
+MCSE of elpd_loo is 0.0.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
