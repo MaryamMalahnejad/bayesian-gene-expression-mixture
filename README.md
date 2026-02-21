@@ -2,20 +2,35 @@
 
 ## Project Overview
 
-This project implements a Bayesian two-component Gaussian mixture model in Stan to identify latent subgroups in gene expression data from the dataset **Breast_GSE45827.csv**.
+This project implements a Bayesian two-component Gaussian mixture model in Stan to identify latent subgroups in breast cancer gene expression data.
 
-The goal is to demonstrate mastery of Bayesian modeling, mixture models, and implementation using R and Stan.
+The objective is to demonstrate proficiency in:
+
+- Bayesian statistical modeling  
+- Finite mixture models  
+- MCMC-based inference  
+- Implementation using R and Stan  
 
 ---
 
-## Data
+## Dataset
 
-Dataset: Breast_GSE45827.csv  
-Location: data/raw/
+The gene expression dataset used in this project is publicly available on Kaggle:
 
-From all numeric gene expression columns, the gene with the highest variance across samples was selected.  
-The expression values were standardized (mean 0, standard deviation 1).
+**Breast Cancer Gene Expression (CUMIDA)**  
+🔗 https://www.kaggle.com/datasets/brunogrisci/breast-cancer-gene-expression-cumida  
 
+The specific dataset used is:
+
+`Breast_GSE45827.csv`
+
+Due to GitHub's 100 MB file size limit, the dataset is not included in this repository.
+
+### How to Reproduce with the Dataset
+
+1. Download the dataset from the Kaggle link above.
+2. Place the file inside:
+data/raw/
 ---
 
 ## Model
@@ -79,3 +94,4 @@ r/run.R         -> Main execution script
 output/         -> Results and plots
 admin/README.md -> Project documentation
 ```
+These results demonstrate the model’s ability to identify latent structure in high-dimensional biological data using Bayesian inference.
