@@ -12,6 +12,8 @@ The objective is to demonstrate practical and theoretical understanding of:
 - Probabilistic programming using Stan  
 - Reproducible data science workflows in R  
 
+The project is motivated by biological heterogeneity in cancer gene expression, where tumor samples may exhibit latent subgroups not directly observable from metadata.
+
 ---
 
 ## Dataset
@@ -21,7 +23,7 @@ The gene expression dataset used in this project is publicly available on Kaggle
 **Breast Cancer Gene Expression (CUMIDA)**  
 https://www.kaggle.com/datasets/brunogrisci/breast-cancer-gene-expression-cumida  
 
-The specific dataset used:
+Dataset used:
 
 Breast_GSE45827.csv
 
@@ -33,7 +35,6 @@ Dataset characteristics:
 - Remaining columns: gene expression values  
 
 Due to GitHub's 100 MB file size limit, the dataset is not included in this repository.
-
 ### Reproducibility
 
 To reproduce the analysis:
@@ -47,12 +48,33 @@ data/raw/Breast_GSE45827.csv
 
 ---
 
+## Biological Motivation and Interpretation
+
+For demonstration, we analyze a gene probe showing clear evidence of bimodal expression behavior across samples.
+
+As an example, the gene ESR1 (Estrogen Receptor 1) is frequently studied in breast cancer research. ESR1 expression is strongly associated with hormone receptor status and plays a central role in tumor subtype classification (e.g., ER-positive vs ER-negative tumors).
+
+Breast cancer is known to be biologically heterogeneous. Distinct tumor subtypes often exhibit different gene expression patterns. Modeling expression with a mixture distribution allows:
+
+Identification of latent expression subgroups
+
+Probabilistic classification of samples
+
+Quantification of uncertainty
+
+Avoidance of arbitrary thresholding
+
+The two mixture components may correspond to biologically meaningful subpopulations, such as hormone-receptor-positive versus negative tumors.
+
+
+
 ## Statistical Model
 
 For a selected gene, standardized expression values  
-x₁, x₂, …, xₙ are modeled as a two-component Gaussian mixture:
+x₁, x₂, …, xₙ  
+are modeled as a two-component Gaussian mixture:
 
-p(xₙ) = θ · Normal(μ₁, σ₁) + (1 − θ) · Normal(μ₂, σ₂)
+p(xₙ) = θ · N(xₙ | μ₁, σ₁²) + (1 − θ) · N(xₙ | μ₂, σ₂²)
 
 where:
 
@@ -64,7 +86,27 @@ To prevent label switching, the component means are constrained:
 
 μ₁ < μ₂
 
+The likelihood for independent samples is:
+
+L(μ₁, μ₂, σ₁, σ₂, θ | x) = ∏_{n=1}^{N} p(xₙ)
 ---
+
+## Why a Mixture Model?
+
+Gene expression in cancer data is often heterogeneous.
+A single Gaussian distribution may fail to capture multiple latent subpopulations.
+
+A two-component mixture model allows:
+
+Modeling latent biological subgroups
+
+Capturing bimodal expression patterns
+
+Full uncertainty quantification via posterior distributions
+
+Interpretable probabilistic clustering
+
+This aligns with modern probabilistic modeling approaches used in genomics.
 
 ## Prior Distributions
 
@@ -72,15 +114,34 @@ The priors are defined as:
 
 - μₖ ~ Normal(0, 5)  
 - σₖ ~ Exponential(1)  
-- θ ~ Beta(2, 2)  
+- θ ~ Dirichlet(2, 2)
 
 Gene expression values are standardized before modeling:
 
 x = (x_raw − mean(x_raw)) / sd(x_raw)
 
-This improves numerical stability and makes priors weakly informative.
+Standardization improves numerical stability and ensures priors are weakly informative.
 
 ---
+## Bayesian Workflow
+
+The modeling process follows a principled Bayesian workflow:
+
+Prior specification
+
+Model implementation in Stan
+
+MCMC sampling
+
+Convergence diagnostics (R-hat, ESS)
+
+Posterior predictive checks
+
+Model comparison using LOO
+
+Biological interpretation
+
+This workflow ensures model validity and interpretability.
 
 ## Inference
 
@@ -119,6 +180,53 @@ The separation between μ₁ and μ₂ suggests bimodal expression behavior for 
 Posterior predictive checks confirm that the model captures the observed distributional structure.
 
 ---
+## Scientific Relevance
+
+Finite mixture models are widely used in genomics to detect:
+
+-Tumor heterogeneity
+
+-Latent biological subgroups
+
+-Differential expression structures
+
+Hidden molecular subtypes
+
+-Bayesian inference provides:
+
+-Full posterior distributions
+
+-Uncertainty quantification
+
+-Principled model comparison
+
+-Avoidance of hard clustering
+
+This project is conceptually related to generalized linear mixture multilevel Bayesian models discussed in the course. While the present implementation is a simpler two-component Gaussian mixture, it illustrates the core principles of probabilistic modeling of biological heterogeneity.
+
+## Limitations
+
+-The model assumes exactly two components.
+
+-No hierarchical structure across patients is modeled.
+
+-Clinical covariates (tumor subtype, age) are not incorporated.
+
+-Standardization removes absolute expression scale information.
+
+Future extensions could include hierarchical Bayesian mixtures or multilevel modeling approaches.
+
+## Future Extensions
+
+-Three-component mixture model
+
+-Hierarchical Bayesian mixture
+
+-Automatic gene screening pipeline
+
+-Subtype-specific modeling
+
+-Comparison with EM-based Gaussian mixtures
 
 ## Running the Project
 
@@ -131,21 +239,22 @@ output/
 ```
 ## Generated files include:
 
-Model fit (.rds)
+-Model fit (.rds)
 
-Posterior summaries (.csv)
+-Posterior summaries (.csv)
 
-Diagnostics (R-hat, ESS)
+-Diagnostics (R-hat, ESS)
 
-Trace plots
+-Trace plots
 
-Posterior density plots
+-Posterior density plots
 
-Posterior predictive checks
+-Posterior predictive checks
 
-LOO results
+-LOO results
 
-Run report
+-Run report
+
 ## Project Structure
 project_mixture_geneexpr/
 │
@@ -162,33 +271,8 @@ project_mixture_geneexpr/
 ├── output/
 │
 └── README.md
-## Scientific Relevance
 
-Finite mixture models are useful in genomics for detecting latent biological subgroups, tumor heterogeneity, or differential expression patterns.
-
-This project demonstrates how Bayesian inference:
-
-Quantifies uncertainty in latent structure
-
-Avoids hard clustering
-
-Provides full posterior distributions
-
-Enables principled model comparison
-
-Future Extensions
-
-Three-component mixture model
-
-Hierarchical Bayesian mixture
-
-Automatic gene screening pipeline
-
-Subtype-specific modeling
-
-Comparison with EM-based Gaussian mixtures
-
-Author
+# Author
 
 Maryam Malahnejad
 MSc Applied Informatics

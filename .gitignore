@@ -7,10 +7,6 @@
 .Rproj.user/
 
 
-output/
-
-*.rds
-*.RDS
 
 data/raw/*.csv
 
